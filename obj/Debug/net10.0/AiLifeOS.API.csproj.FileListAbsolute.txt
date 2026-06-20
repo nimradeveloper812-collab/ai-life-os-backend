@@ -159,3 +159,6 @@ C:\Users\nimra\OneDrive\Desktop\AI-Life-OS\backend\AiLifeOS.API\obj\Debug\net10.
 C:\Users\nimra\OneDrive\Desktop\AI-Life-OS\backend\AiLifeOS.API\obj\Debug\net10.0\AiLifeOS.API.pdb
 C:\Users\nimra\OneDrive\Desktop\AI-Life-OS\backend\AiLifeOS.API\obj\Debug\net10.0\AiLifeOS.API.genruntimeconfig.cache
 C:\Users\nimra\OneDrive\Desktop\AI-Life-OS\backend\AiLifeOS.API\obj\Debug\net10.0\ref\AiLifeOS.API.dll
+C:\Users\nimra\OneDrive\Desktop\AI-Life-OS\backend\AiLifeOS.API\bin\Debug\net10.0\Npgsql.dll
+C:\Users\nimra\OneDrive\Desktop\AI-Life-OS\backend\AiLifeOS.API\bin\Debug\net10.0\Npgsql.EntityFrameworkCore.PostgreSQL.dll
+C:\Users\nimra\OneDrive\Desktop\AI-Life-OS\backend\AiLifeOS.API\obj\Debug\net10.0\AiLifeOS.API.sourcelink.json
