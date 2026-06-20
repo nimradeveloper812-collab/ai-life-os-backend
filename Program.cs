@@ -9,8 +9,7 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(
-        builder.Configuration.GetConnectionString("DefaultConnection"),
-        o => o.RemoteCertificateValidationCallback((sender, cert, chain, errors) => true)
+        builder.Configuration.GetConnectionString("DefaultConnection")
     ));
 
 builder.Services.AddCors(options =>
