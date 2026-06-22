@@ -34,7 +34,7 @@ public class ExpenseController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Create(Expense expense)
     {
-        expense.Date = DateTime.Now;
+        expense.Date = DateTime.UtcNow;
         _db.Expenses.Add(expense);
         await _db.SaveChangesAsync();
         return Ok(expense);
