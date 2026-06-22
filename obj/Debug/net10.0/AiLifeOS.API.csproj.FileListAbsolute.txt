@@ -162,3 +162,8 @@ C:\Users\nimra\OneDrive\Desktop\AI-Life-OS\backend\AiLifeOS.API\obj\Debug\net10.
 C:\Users\nimra\OneDrive\Desktop\AI-Life-OS\backend\AiLifeOS.API\bin\Debug\net10.0\Npgsql.dll
 C:\Users\nimra\OneDrive\Desktop\AI-Life-OS\backend\AiLifeOS.API\bin\Debug\net10.0\Npgsql.EntityFrameworkCore.PostgreSQL.dll
 C:\Users\nimra\OneDrive\Desktop\AI-Life-OS\backend\AiLifeOS.API\obj\Debug\net10.0\AiLifeOS.API.sourcelink.json
+C:\Users\nimra\OneDrive\Desktop\AI-Life-OS\backend\AiLifeOS.API\bin\Debug\net10.0\BCrypt-Net-Next.dll
+C:\Users\nimra\OneDrive\Desktop\AI-Life-OS\backend\AiLifeOS.API\bin\Debug\net10.0\BouncyCastle.Cryptography.dll
+C:\Users\nimra\OneDrive\Desktop\AI-Life-OS\backend\AiLifeOS.API\bin\Debug\net10.0\MailKit.dll
+C:\Users\nimra\OneDrive\Desktop\AI-Life-OS\backend\AiLifeOS.API\bin\Debug\net10.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
+C:\Users\nimra\OneDrive\Desktop\AI-Life-OS\backend\AiLifeOS.API\bin\Debug\net10.0\MimeKit.dll

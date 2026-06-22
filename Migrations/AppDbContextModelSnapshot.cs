@@ -31,13 +31,13 @@ namespace AiLifeOS.API.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<decimal>("Amount")
-                        .HasColumnType("numeric");
+                        .HasColumnType("decimal(10,2)");
 
                     b.Property<string>("Category")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<DateTime>("Date")
+                    b.Property<DateTime?>("Date")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Title")
@@ -138,6 +138,9 @@ namespace AiLifeOS.API.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<string>("GoogleId")
+                        .HasColumnType("text");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
@@ -145,6 +148,12 @@ namespace AiLifeOS.API.Migrations
                     b.Property<string>("PasswordHash")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<string>("ResetToken")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("ResetTokenExpiry")
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
