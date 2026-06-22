@@ -19,7 +19,7 @@ public class TaskController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Create(TaskItem task)
     {
-        task.CreatedAt = DateTime.Now;
+      task.CreatedAt = DateTime.UtcNow;
         _db.Tasks.Add(task);
         await _db.SaveChangesAsync();
         return Ok(task);

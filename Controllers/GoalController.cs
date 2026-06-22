@@ -19,7 +19,7 @@ public class GoalController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Create(Goal goal)
     {
-        goal.CreatedAt = DateTime.Now;
+        goal.CreatedAt = DateTime.UtcNow;
         _db.Goals.Add(goal);
         await _db.SaveChangesAsync();
         return Ok(goal);
