@@ -152,7 +152,7 @@ public class AuthController : ControllerBase
 
         var body = new
         {
-            from = "AI Life OS <onboarding@resend.dev>",
+            from = "AI Life OS <noreply@afaqmart.store>",
             to = new[] { email },
             subject = "Password Reset - AI Life OS",
             html = $@"
