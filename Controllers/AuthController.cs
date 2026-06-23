@@ -149,7 +149,8 @@ public class AuthController : ControllerBase
         var resetLink = $"{frontendUrl}/reset-password?token={token}";
 
         var message = new MimeMessage();
-        message.From.Add(new MailboxAddress("AI Life OS", _config["Email:Username"]));
+        var emailUsername = _config["Email:Username"] ?? throw new InvalidOperationException("Email username not configured");
+        message.From.Add(new MailboxAddress("AI Life OS", emailUsername));
         message.To.Add(new MailboxAddress("", email));
         message.Subject = "Password Reset - AI Life OS";
         message.Body = new TextPart("html")
@@ -164,14 +165,20 @@ public class AuthController : ControllerBase
 
         using var client = new SmtpClient();
         client.Timeout = 10000;
+
+        var emailHost = _config["Email:Host"] ?? throw new InvalidOperationException("Email host not configured");
+        var emailPort = int.Parse(_config["Email:Port"] ?? "587");
+        var emailUser = _config["Email:Username"] ?? throw new InvalidOperationException("Email username not configured");
+        var emailPass = _config["Email:Password"] ?? throw new InvalidOperationException("Email password not configured");
+
         await client.ConnectAsync(
-            _config["Email:Host"],
-            int.Parse(_config["Email:Port"] ?? "587"),
+            emailHost,
+            emailPort,
             MailKit.Security.SecureSocketOptions.StartTls
         );
         await client.AuthenticateAsync(
-            _config["Email:Username"],
-            _config["Email:Password"]
+            emailUser,
+            emailPass
         );
         await client.SendAsync(message);
         await client.DisconnectAsync(true);
