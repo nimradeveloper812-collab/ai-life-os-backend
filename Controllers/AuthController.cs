@@ -6,8 +6,6 @@ using System.Security.Claims;
 using System.Text;
 using AiLifeOS.API.Data;
 using AiLifeOS.API.Models;
-using MailKit.Net.Smtp;
-using MimeKit;
 
 namespace AiLifeOS.API.Controllers;
 
@@ -96,7 +94,7 @@ public class AuthController : ControllerBase
         catch (Exception ex)
         {
             Console.WriteLine($"EMAIL ERROR: {ex.Message}");
-            return Ok(new { message = "Reset token saved but email failed: " + ex.Message });
+            return Ok(new { message = "Email failed: " + ex.Message });
         }
 
         return Ok(new { message = "Reset link sent to your email" });
@@ -148,39 +146,37 @@ public class AuthController : ControllerBase
         var frontendUrl = "https://ai-life-os-frontend.vercel.app";
         var resetLink = $"{frontendUrl}/reset-password?token={token}";
 
-        var message = new MimeMessage();
-        var emailUsername = _config["Email:Username"] ?? throw new InvalidOperationException("Email username not configured");
-        message.From.Add(new MailboxAddress("AI Life OS", emailUsername));
-        message.To.Add(new MailboxAddress("", email));
-        message.Subject = "Password Reset - AI Life OS";
-        message.Body = new TextPart("html")
+        var apiKey = _config["Resend:ApiKey"];
+        var client = new HttpClient();
+        client.DefaultRequestHeaders.Add("Authorization", $"Bearer {apiKey}");
+
+        var body = new
         {
-            Text = $@"
-                <h2>Password Reset</h2>
-                <p>Click the link below to reset your password:</p>
-                <a href='{resetLink}'>Reset Password</a>
-                <p>This link expires in 1 hour.</p>
+            from = "AI Life OS <onboarding@resend.dev>",
+            to = new[] { email },
+            subject = "Password Reset - AI Life OS",
+            html = $@"
+                <div style='font-family:Arial,sans-serif;max-width:500px;margin:0 auto;padding:20px'>
+                    <h2 style='color:#2563eb'>🔑 Password Reset</h2>
+                    <p>Click the button below to reset your password:</p>
+                    <a href='{resetLink}' 
+                       style='background:#2563eb;color:white;padding:12px 24px;border-radius:8px;text-decoration:none;display:inline-block;margin:16px 0'>
+                       Reset Password
+                    </a>
+                    <p style='color:#666;font-size:14px'>This link expires in 1 hour.</p>
+                    <p style='color:#666;font-size:14px'>If you didn't request this, ignore this email.</p>
+                </div>
             "
         };
 
-        using var client = new SmtpClient();
-        client.Timeout = 10000;
+        var json = System.Text.Json.JsonSerializer.Serialize(body);
+        var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+        var response = await client.PostAsync("https://api.resend.com/emails", content);
 
-        var emailHost = _config["Email:Host"] ?? throw new InvalidOperationException("Email host not configured");
-        var emailPort = int.Parse(_config["Email:Port"] ?? "587");
-        var emailUser = _config["Email:Username"] ?? throw new InvalidOperationException("Email username not configured");
-        var emailPass = _config["Email:Password"] ?? throw new InvalidOperationException("Email password not configured");
-
-        await client.ConnectAsync(
-            emailHost,
-            emailPort,
-            MailKit.Security.SecureSocketOptions.StartTls
-        );
-        await client.AuthenticateAsync(
-            emailUser,
-            emailPass
-        );
-        await client.SendAsync(message);
-        await client.DisconnectAsync(true);
+        if (!response.IsSuccessStatusCode)
+        {
+            var error = await response.Content.ReadAsStringAsync();
+            throw new Exception($"Resend error: {error}");
+        }
     }
 }
