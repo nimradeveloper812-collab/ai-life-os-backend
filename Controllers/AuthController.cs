@@ -24,7 +24,6 @@ public class AuthController : ControllerBase
         _config = config;
     }
 
-    // POST: api/auth/register
     [HttpPost("register")]
     public async Task<IActionResult> Register(RegisterDto dto)
     {
@@ -41,11 +40,9 @@ public class AuthController : ControllerBase
 
         _db.Users.Add(user);
         await _db.SaveChangesAsync();
-
         return Ok(new { message = "Registration successful", userId = user.Id });
     }
 
-    // POST: api/auth/login
     [HttpPost("login")]
     public async Task<IActionResult> Login(LoginDto dto)
     {
@@ -57,7 +54,6 @@ public class AuthController : ControllerBase
         return Ok(new { token, userId = user.Id, name = user.Name, email = user.Email });
     }
 
-    // POST: api/auth/google
     [HttpPost("google")]
     public async Task<IActionResult> GoogleLogin(GoogleLoginDto dto)
     {
@@ -81,33 +77,31 @@ public class AuthController : ControllerBase
         return Ok(new { token, userId = user.Id, name = user.Name, email = user.Email });
     }
 
-    // POST: api/auth/forgot-password
-  [HttpPost("forgot-password")]
-public async Task<IActionResult> ForgotPassword(ForgotPasswordDto dto)
-{
-    var user = await _db.Users.FirstOrDefaultAsync(u => u.Email == dto.Email);
-    if (user == null)
-        return Ok(new { message = "If email exists, reset link sent" });
-
-    var token = Guid.NewGuid().ToString();
-    user.ResetToken = token;
-    user.ResetTokenExpiry = DateTime.UtcNow.AddHours(1);
-    await _db.SaveChangesAsync();
-
-    try
+    [HttpPost("forgot-password")]
+    public async Task<IActionResult> ForgotPassword(ForgotPasswordDto dto)
     {
-        await SendResetEmail(user.Email, token);
-    }
-    catch (Exception ex)
-    {
-        Console.WriteLine($"EMAIL ERROR: {ex.Message}");
-        return Ok(new { message = "Reset token saved but email failed: " + ex.Message });
+        var user = await _db.Users.FirstOrDefaultAsync(u => u.Email == dto.Email);
+        if (user == null)
+            return Ok(new { message = "If email exists, reset link sent" });
+
+        var token = Guid.NewGuid().ToString();
+        user.ResetToken = token;
+        user.ResetTokenExpiry = DateTime.UtcNow.AddHours(1);
+        await _db.SaveChangesAsync();
+
+        try
+        {
+            await SendResetEmail(user.Email, token);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"EMAIL ERROR: {ex.Message}");
+            return Ok(new { message = "Reset token saved but email failed: " + ex.Message });
+        }
+
+        return Ok(new { message = "Reset link sent to your email" });
     }
 
-    return Ok(new { message = "Reset link sent to your email" });
-}
-
-    // POST: api/auth/reset-password
     [HttpPost("reset-password")]
     public async Task<IActionResult> ResetPassword(ResetPasswordDto dto)
     {
@@ -122,7 +116,6 @@ public async Task<IActionResult> ForgotPassword(ForgotPasswordDto dto)
         user.ResetToken = null;
         user.ResetTokenExpiry = null;
         await _db.SaveChangesAsync();
-
         return Ok(new { message = "Password reset successful" });
     }
 
@@ -170,8 +163,16 @@ public async Task<IActionResult> ForgotPassword(ForgotPasswordDto dto)
         };
 
         using var client = new SmtpClient();
-        await client.ConnectAsync(_config["Email:Host"], int.Parse(_config["Email:Port"]!), false);
-        await client.AuthenticateAsync(_config["Email:Username"], _config["Email:Password"]);
+        client.Timeout = 10000;
+        await client.ConnectAsync(
+            _config["Email:Host"],
+            int.Parse(_config["Email:Port"] ?? "587"),
+            MailKit.Security.SecureSocketOptions.StartTls
+        );
+        await client.AuthenticateAsync(
+            _config["Email:Username"],
+            _config["Email:Password"]
+        );
         await client.SendAsync(message);
         await client.DisconnectAsync(true);
     }
