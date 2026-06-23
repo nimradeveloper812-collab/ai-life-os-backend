@@ -82,21 +82,30 @@ public class AuthController : ControllerBase
     }
 
     // POST: api/auth/forgot-password
-    [HttpPost("forgot-password")]
-    public async Task<IActionResult> ForgotPassword(ForgotPasswordDto dto)
+  [HttpPost("forgot-password")]
+public async Task<IActionResult> ForgotPassword(ForgotPasswordDto dto)
+{
+    var user = await _db.Users.FirstOrDefaultAsync(u => u.Email == dto.Email);
+    if (user == null)
+        return Ok(new { message = "If email exists, reset link sent" });
+
+    var token = Guid.NewGuid().ToString();
+    user.ResetToken = token;
+    user.ResetTokenExpiry = DateTime.UtcNow.AddHours(1);
+    await _db.SaveChangesAsync();
+
+    try
     {
-        var user = await _db.Users.FirstOrDefaultAsync(u => u.Email == dto.Email);
-        if (user == null)
-            return Ok(new { message = "If email exists, reset link sent" });
-
-        var token = Guid.NewGuid().ToString();
-        user.ResetToken = token;
-        user.ResetTokenExpiry = DateTime.UtcNow.AddHours(1);
-        await _db.SaveChangesAsync();
-
         await SendResetEmail(user.Email, token);
-        return Ok(new { message = "Reset link sent to your email" });
     }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"EMAIL ERROR: {ex.Message}");
+        return Ok(new { message = "Reset token saved but email failed: " + ex.Message });
+    }
+
+    return Ok(new { message = "Reset link sent to your email" });
+}
 
     // POST: api/auth/reset-password
     [HttpPost("reset-password")]
