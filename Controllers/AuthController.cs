@@ -150,23 +150,67 @@ public class AuthController : ControllerBase
         var client = new HttpClient();
         client.DefaultRequestHeaders.Add("Authorization", $"Bearer {apiKey}");
 
+        var emailHtml = $@"<!DOCTYPE html>
+<html>
+<head>
+  <meta charset='UTF-8'>
+  <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+</head>
+<body style='margin:0;padding:0;background:#f8fafc;font-family:Arial,sans-serif'>
+  <table width='100%' cellpadding='0' cellspacing='0' style='background:#f8fafc;padding:40px 0'>
+    <tr>
+      <td align='center'>
+        <table width='520' cellpadding='0' cellspacing='0' style='background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08)'>
+          <tr>
+            <td style='background:#2563eb;padding:36px 40px;text-align:center'>
+              <h1 style='margin:0;color:#ffffff;font-size:26px;font-weight:700'>⚡ AI Life OS</h1>
+              <p style='margin:8px 0 0;color:#bfdbfe;font-size:14px'>Your Personal AI Life Operating System</p>
+            </td>
+          </tr>
+          <tr>
+            <td style='padding:40px'>
+              <h2 style='margin:0 0 16px;color:#1e293b;font-size:22px;font-weight:600'>Reset Your Password 🔑</h2>
+              <p style='margin:0 0 24px;color:#64748b;font-size:15px;line-height:1.6'>
+                We received a request to reset your password. Click the button below to create a new password. This link will expire in <strong>1 hour</strong>.
+              </p>
+              <table width='100%' cellpadding='0' cellspacing='0'>
+                <tr>
+                  <td align='center' style='padding:8px 0 32px'>
+                    <a href='{resetLink}' style='background:#2563eb;color:#ffffff;padding:14px 36px;border-radius:10px;text-decoration:none;font-size:15px;font-weight:600;display:inline-block'>
+                      Reset My Password →
+                    </a>
+                  </td>
+                </tr>
+              </table>
+              <div style='background:#f1f5f9;border-radius:8px;padding:16px;margin-bottom:24px'>
+                <p style='margin:0 0 6px;color:#94a3b8;font-size:12px'>Or copy this link:</p>
+                <p style='margin:0;color:#2563eb;font-size:13px;word-break:break-all'>{resetLink}</p>
+              </div>
+              <div style='border-left:4px solid #f59e0b;padding:12px 16px;background:#fffbeb;border-radius:0 8px 8px 0'>
+                <p style='margin:0;color:#92400e;font-size:13px'>
+                  If you did not request this, please ignore this email.
+                </p>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td style='background:#f8fafc;padding:24px 40px;border-top:1px solid #e2e8f0;text-align:center'>
+              <p style='margin:0;color:#94a3b8;font-size:13px'>© 2024 AI Life OS · All rights reserved</p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>";
+
         var body = new
         {
             from = "AI Life OS <noreply@afaqmart.store>",
             to = new[] { email },
             subject = "Password Reset - AI Life OS",
-            html = $@"
-                <div style='font-family:Arial,sans-serif;max-width:500px;margin:0 auto;padding:20px'>
-                    <h2 style='color:#2563eb'>🔑 Password Reset</h2>
-                    <p>Click the button below to reset your password:</p>
-                    <a href='{resetLink}' 
-                       style='background:#2563eb;color:white;padding:12px 24px;border-radius:8px;text-decoration:none;display:inline-block;margin:16px 0'>
-                       Reset Password
-                    </a>
-                    <p style='color:#666;font-size:14px'>This link expires in 1 hour.</p>
-                    <p style='color:#666;font-size:14px'>If you didn't request this, ignore this email.</p>
-                </div>
-            "
+            html = emailHtml
         };
 
         var json = System.Text.Json.JsonSerializer.Serialize(body);
