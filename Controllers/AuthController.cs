@@ -75,6 +75,21 @@ public class AuthController : ControllerBase
         return Ok(new { token, userId = user.Id, name = user.Name, email = user.Email });
     }
 
+    [HttpPost("change-password")]
+public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDto dto)
+{
+    var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+    var user = await _db.Users.FindAsync(int.Parse(userId!));
+    if (user == null) return NotFound();
+
+    if (!BCrypt.Net.BCrypt.Verify(dto.CurrentPassword, user.PasswordHash))
+        return BadRequest(new { message = "Current password is incorrect" });
+
+    user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.NewPassword);
+    await _db.SaveChangesAsync();
+    return Ok(new { message = "Password changed successfully" });
+}
+
     [HttpPost("forgot-password")]
     public async Task<IActionResult> ForgotPassword(ForgotPasswordDto dto)
     {
@@ -224,3 +239,5 @@ public class AuthController : ControllerBase
         }
     }
 }
+
+

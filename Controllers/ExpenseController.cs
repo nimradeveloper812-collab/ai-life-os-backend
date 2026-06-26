@@ -10,18 +10,15 @@ namespace AiLifeOS.API.Controllers;
 public class ExpenseController : ControllerBase
 {
     private readonly AppDbContext _db;
-
-    public ExpenseController(AppDbContext db)
-    {
-        _db = db;
-    }
+    public ExpenseController(AppDbContext db) { _db = db; }
 
     [HttpGet]
-    public async Task<IActionResult> GetAll()
-    {
-        var expenses = await _db.Expenses.ToListAsync();
-        return Ok(expenses);
-    }
+    public async Task<IActionResult> GetAll() =>
+        Ok(await _db.Expenses.ToListAsync());
+
+    [HttpGet("user/{userId}")]
+    public async Task<IActionResult> GetByUser(int userId) =>
+        Ok(await _db.Expenses.Where(e => e.UserId == userId).OrderByDescending(e => e.Date).ToListAsync());
 
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(int id)
@@ -45,12 +42,10 @@ public class ExpenseController : ControllerBase
     {
         var expense = await _db.Expenses.FindAsync(id);
         if (expense == null) return NotFound();
-
         expense.Title = updated.Title;
         expense.Amount = updated.Amount;
         expense.Type = updated.Type;
         expense.Category = updated.Category;
-
         await _db.SaveChangesAsync();
         return Ok(expense);
     }
@@ -60,9 +55,8 @@ public class ExpenseController : ControllerBase
     {
         var expense = await _db.Expenses.FindAsync(id);
         if (expense == null) return NotFound();
-
         _db.Expenses.Remove(expense);
         await _db.SaveChangesAsync();
-        return Ok(new { message = "Deleted successfully" });
+        return Ok(new { message = "Deleted" });
     }
 }

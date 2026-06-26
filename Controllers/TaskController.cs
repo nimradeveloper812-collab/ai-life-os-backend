@@ -12,14 +12,14 @@ public class TaskController : ControllerBase
     private readonly AppDbContext _db;
     public TaskController(AppDbContext db) { _db = db; }
 
-    [HttpGet]
-    public async Task<IActionResult> GetAll() =>
-        Ok(await _db.Tasks.ToListAsync());
+    [HttpGet("user/{userId}")]
+    public async Task<IActionResult> GetByUser(int userId) =>
+        Ok(await _db.Tasks.Where(t => t.UserId == userId).OrderByDescending(t => t.CreatedAt).ToListAsync());
 
     [HttpPost]
     public async Task<IActionResult> Create(TaskItem task)
     {
-      task.CreatedAt = DateTime.UtcNow;
+        task.CreatedAt = DateTime.UtcNow;
         _db.Tasks.Add(task);
         await _db.SaveChangesAsync();
         return Ok(task);
