@@ -12,30 +12,16 @@ public class AiController : ControllerBase
 {
     private readonly AppDbContext _db;
     private readonly HttpClient _http = new();
-
-    public AiController(AppDbContext db)
-    {
-        _db = db;
-    }
-
     private readonly string _groqKey = "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";
+
+    public AiController(AppDbContext db) { _db = db; }
 
     [HttpPost("analyze/{userId}")]
     public async Task<IActionResult> Analyze(int userId, [FromBody] AiRequestDto dto)
     {
-        var expenses = await _db.Expenses
-            .Where(e => e.UserId == userId)
-            .OrderByDescending(e => e.Date)
-            .Take(10).ToListAsync();
-
-        var tasks = await _db.Tasks
-            .Where(t => t.UserId == userId)
-            .OrderByDescending(t => t.CreatedAt)
-            .Take(10).ToListAsync();
-
-        var goals = await _db.Goals
-            .Where(g => g.UserId == userId)
-            .Take(5).ToListAsync();
+        var expenses = await _db.Expenses.Where(e => e.UserId == userId).OrderByDescending(e => e.Date).Take(10).ToListAsync();
+        var tasks = await _db.Tasks.Where(t => t.UserId == userId).OrderByDescending(t => t.CreatedAt).Take(10).ToListAsync();
+        var goals = await _db.Goals.Where(g => g.UserId == userId).Take(5).ToListAsync();
 
         var totalIncome = expenses.Where(e => e.Type == "Income").Sum(e => e.Amount);
         var totalExpense = expenses.Where(e => e.Type == "Expense").Sum(e => e.Amount);
@@ -49,15 +35,13 @@ User data:
 - Goals: {goals.Count} active
 - Recent: {string.Join(", ", expenses.Take(3).Select(e => $"{e.Title}(Rs.{e.Amount})"))}";
 
-        var userMessage = dto.Message ?? "Give me a quick life summary.";
-
         var groqBody = new
         {
-            model = "llama3-8b-8192",
+            model = "llama-3.3-70b-versatile",
             messages = new[]
             {
                 new { role = "system", content = systemPrompt },
-                new { role = "user", content = userMessage }
+                new { role = "user", content = dto.Message ?? "Give me a quick life summary." }
             },
             max_tokens = 300,
             temperature = 0.7
@@ -78,12 +62,7 @@ User data:
 
         var result = await response.Content.ReadAsStringAsync();
         var parsed = JsonDocument.Parse(result);
-        var aiResponse = parsed.RootElement
-            .GetProperty("choices")[0]
-            .GetProperty("message")
-            .GetProperty("content")
-            .GetString();
-
+        var aiResponse = parsed.RootElement.GetProperty("choices")[0].GetProperty("message").GetProperty("content").GetString();
         return Ok(new { response = aiResponse });
     }
 
@@ -105,7 +84,7 @@ Tasks: {completedTasks}/{tasks.Count} done. Goals: {goals.Count} active.";
 
         var groqBody = new
         {
-            model = "llama3-8b-8192",
+            model = "llama-3.3-70b-versatile",
             messages = new[]
             {
                 new { role = "system", content = "You are AI Life OS, a personal life coach. Be motivating, use emojis." },
@@ -124,12 +103,7 @@ Tasks: {completedTasks}/{tasks.Count} done. Goals: {goals.Count} active.";
 
         var result = await response.Content.ReadAsStringAsync();
         var parsed = JsonDocument.Parse(result);
-        var aiResponse = parsed.RootElement
-            .GetProperty("choices")[0]
-            .GetProperty("message")
-            .GetProperty("content")
-            .GetString();
-
+        var aiResponse = parsed.RootElement.GetProperty("choices")[0].GetProperty("message").GetProperty("content").GetString();
         return Ok(new { report = aiResponse });
     }
 }
