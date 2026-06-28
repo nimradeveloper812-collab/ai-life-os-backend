@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("AiLifeOS.API")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+9e1c455a1ec481bacf7d6166eb36ef2b7829bf94")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+5e08aabfa1df4a7070f13ef63406089b9d1555b2")]
 [assembly: System.Reflection.AssemblyProductAttribute("AiLifeOS.API")]
 [assembly: System.Reflection.AssemblyTitleAttribute("AiLifeOS.API")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
