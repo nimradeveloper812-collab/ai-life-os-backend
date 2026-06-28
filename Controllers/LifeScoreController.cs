@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using AiLifeOS.API.Data;
 
@@ -17,24 +18,20 @@ public class LifeScoreController : ControllerBase
         var tasks = await _db.Tasks.Where(t => t.UserId == userId).ToListAsync();
         var goals = await _db.Goals.Where(g => g.UserId == userId).ToListAsync();
 
-        // Money Score (0-25)
         var totalIncome = expenses.Where(e => e.Type == "Income").Sum(e => e.Amount);
         var totalExpense = expenses.Where(e => e.Type == "Expense").Sum(e => e.Amount);
         var savingsRate = totalIncome > 0 ? (double)(totalIncome - totalExpense) / (double)totalIncome : 0;
         var moneyScore = (int)Math.Min(25, Math.Max(0, savingsRate * 25));
 
-        // Task Score (0-25)
         var taskScore = tasks.Count > 0
             ? (int)(((double)tasks.Count(t => t.IsCompleted) / tasks.Count) * 25)
             : 0;
 
-        // Goal Score (0-25)
         var goalScore = goals.Count > 0
             ? (int)(goals.Average(g => g.TargetValue > 0
                 ? Math.Min(100, (double)g.CurrentValue / (double)g.TargetValue * 100) : 0) / 4)
             : 0;
 
-        // Activity Score (0-25) — based on recent activity
         var recentExpenses = expenses.Count(e => e.Date >= DateTime.UtcNow.AddDays(-7));
         var recentTasks = tasks.Count(t => t.CreatedAt >= DateTime.UtcNow.AddDays(-7));
         var activityScore = Math.Min(25, (recentExpenses + recentTasks) * 3);
