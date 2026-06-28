@@ -14,6 +14,7 @@ public class AppDbContext : DbContext
     public DbSet<Goal> Goals { get; set; }
 
     public DbSet<HealthLog> HealthLogs { get; set; }
+public DbSet<Budget> Budgets { get; set; }
 
     public DbSet<Habit> Habits { get; set; }
     public DbSet<HabitLog> HabitLogs { get; set; }
